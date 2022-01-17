@@ -1,0 +1,161 @@
+//---------------------------------------------------------------------------
+
+#include <vcl.h>
+#pragma hdrstop
+
+#include "Unit2.h"
+//---------------------------------------------------------------------------
+#pragma package(smart_init)
+#pragma resource "*.dfm"
+TMainForm *MainForm;
+//---------------------------------------------------------------------------
+__fastcall TMainForm::TMainForm(TComponent* Owner)
+	: TForm(Owner)
+{
+}
+//---------------------------------------------------------------------------
+
+void Circle(int x, int y, int r) {
+	MainForm -> Canvas -> Ellipse(x - r, y - r, x + r, y + r);
+}
+
+void SimpleEllipse(int x, int y, int d1, int d2) {
+	MainForm -> Canvas -> Ellipse(x - d1, y - d2, x + d1, y + d2);
+}
+
+void Cloud(int x, int y, int scale){
+	MainForm -> Canvas -> Brush -> Color = TColor(RGB(240, 240, 255));
+	MainForm -> Canvas -> Pen -> Color = TColor(RGB(240, 240, 255));
+	int _size = 10 * scale;
+	int d1 = _size * 3;
+	int d2 = _size * 2;
+	MainForm -> Canvas -> Chord(x, y, x + d1, y + d2, x + d1, y + d2 / 2, x, y + d2 / 2);
+	int dx = _size;
+	MainForm -> Canvas -> Chord(x, y + d2 / 4,	   		x + dx, y + 3 * d2 / 4, 	x, y + d2 / 2, x + d1, y + d2 / 2);
+	MainForm -> Canvas -> Chord(x + dx, y + d2 / 4, 	x + 2 * dx,	y + 3 * d2 / 4, x, y + d2 / 2, x + d1, y + d2 / 2);
+	MainForm -> Canvas -> Chord(x + 2 * dx, y + d2 / 4,	x + 3 * dx,	y + 3 * d2 / 4, x, y + d2 / 2, x + d1, y + d2 / 2);
+}
+
+
+void Sky(){
+	MainForm -> Canvas -> Brush -> Color = TColor(RGB(80, 80, 240));
+	MainForm -> Canvas -> Pen -> Color = TColor(RGB(80, 80, 240));
+	int sky_width = MainForm -> Width - 20;
+	int sky_height = MainForm -> Height - 100;
+	MainForm -> Canvas -> Rectangle(5, 5, sky_width, sky_height);
+	Cloud(sky_width * 0.2, sky_height * 0.1, 3);
+	Cloud(sky_width * 0.4, sky_height * 0.2, 4);
+	Cloud(sky_width * 0.6, sky_height * 0.1, 3);
+}
+
+
+
+void Eyes(int x, int y, int _size){
+    MainForm -> Canvas -> Brush -> Color = TColor(RGB(20, 20, 20));
+	MainForm -> Canvas -> Pen -> Color = TColor(RGB(20, 20, 20));
+	int eye_size = _size / 10;
+	Circle(x - _size / 2, y - _size / 2, eye_size);
+	Circle(x + _size / 2, y - _size / 2, eye_size);
+}
+
+void Nose(int x, int y, int _size){
+	MainForm -> Canvas -> Brush -> Color = TColor(RGB(200, 170, 20));
+	MainForm -> Canvas -> Pen -> Color = TColor(RGB(200, 170, 20));
+	TPoint points [3] = {{x, y - _size / 5}, {x + _size / 2, y - _size / 10}, {x, y}};
+	MainForm -> Canvas -> Polygon(points, 2);
+}
+
+void Mouth(int x, int y, int _size){
+	MainForm -> Canvas -> Brush -> Color = TColor(RGB(20, 20, 20));
+	MainForm -> Canvas -> Pen -> Color = TColor(RGB(20, 20, 20));
+	int offset = _size / 4;
+	MainForm -> Canvas -> Chord(x - offset, y + offset, x + offset, y + offset + _size / 5, x - offset, y + offset + _size / 10, x + offset, y + offset + _size / 10);
+
+}
+
+void DrawHead(int x, int y, int _size){
+	MainForm -> Canvas -> Brush -> Color = TColor(RGB(200, 200, 200));
+	MainForm -> Canvas -> Pen -> Color = TColor(RGB(200, 200, 200));
+	SimpleEllipse(x, y, _size, _size);
+	Eyes(x, y, _size);
+	Nose(x, y, _size);
+	Mouth(x, y, _size);
+}
+
+void DrawArms(int x, int y, int _size, int y_body_center){
+    MainForm -> Canvas -> Brush -> Color = TColor(RGB(0, 0, 0));
+	MainForm -> Canvas -> Pen -> Color = TColor(RGB(0, 0, 0));
+	MainForm -> Canvas -> Pen -> Width = 5;
+	MainForm -> Canvas -> MoveTo(x - _size, y + _size);
+	MainForm -> Canvas -> LineTo(x - _size * 2, y_body_center);
+	MainForm -> Canvas -> MoveTo(x + _size, y + _size);
+	MainForm -> Canvas -> LineTo(x + _size * 2, y_body_center);
+}
+
+void DrawBody(int x, int y, int _size){
+	MainForm -> Canvas -> Brush -> Color = TColor(RGB(200, 200, 200));
+	MainForm -> Canvas -> Pen -> Color = TColor(RGB(200, 200, 200));
+	int r1 = _size * 1.25;
+	int y_body_center = y + _size * 0.6 + r1;
+	SimpleEllipse(x, y_body_center, r1 * 1.1, r1);
+	DrawArms(x, y, _size, y_body_center);
+}
+
+void DrawBottom(int x, int y, int _size){
+	MainForm -> Canvas -> Brush -> Color = TColor(RGB(200, 200, 200));
+	MainForm -> Canvas -> Pen -> Color = TColor(RGB(200, 200, 200));
+	int r1 = _size * 1.7;
+	int y_bottom_center = y + _size * 4;
+	SimpleEllipse(x, y_bottom_center, r1 * 1.1, r1);
+}
+
+void SnowMan(){
+
+	int size = MainForm -> Height / 17;
+	int x_start = MainForm -> Width / 5;
+	int y_start = MainForm -> Height / 2;
+	DrawHead(x_start, y_start, size);
+	DrawBody(x_start, y_start, size);
+	DrawBottom(x_start, y_start, size);
+}
+
+
+
+void Triangle(int x, int y, int _size){
+	MainForm -> Canvas -> Brush -> Color = TColor(RGB(20, 170, 20));
+	MainForm -> Canvas -> Pen -> Color = TColor(RGB(20, 170, 20));
+	TPoint points [3] = {{x, y}, {x + _size / 2, y + _size}, {x - _size / 2, y + _size}};
+	MainForm -> Canvas -> Polygon(points, 2);
+}
+
+
+
+
+void FirTree(){
+    int size = MainForm -> Height / 17;
+	int x_start = MainForm -> Width * 0.7;
+	int y_start = MainForm -> Height * 0.4;
+	Triangle(x_start, y_start, size);
+	Triangle(x_start, y_start + size * 0.7, size * 1.5);
+	Triangle(x_start, y_start + size * 1.7, size * 2);
+}
+
+
+
+
+
+
+
+
+void DrawPicture(){
+	Sky();
+	SnowMan();
+	FirTree();
+}
+
+
+void __fastcall TMainForm::btnPictureClick(TObject *Sender)
+{
+	DrawPicture();
+}
+//---------------------------------------------------------------------------
